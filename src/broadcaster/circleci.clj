@@ -3,9 +3,9 @@
 
 (defn- valid-circleci-signature? [request secret]
   (let [{:keys [headers body]} request
-        header-signature (get headers "circleci-signature")]
-    (signature/valid-hex-signature? "HMACSHA256" header-signature body secret)))
+        signature (get headers "circleci-signature")]
+    (signature/valid-hex-signature? "HMACSHA256" signature body secret "UTF-8")))
 
 (defn circleci-request [request secret]
-  (let [valid-request? (valid-circleci-signature? request secret)]
-    valid-request?))
+  (let [valid-request (valid-circleci-signature? request secret)]
+    valid-request))

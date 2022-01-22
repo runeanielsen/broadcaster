@@ -15,6 +15,7 @@
           (.update (.getBytes string encoding)))
         .doFinal)))
 
-(defn valid-hex-signature? [algorithm signature string secret]
-  (let [mac (Mac/getInstance algorithm)]
-    (= signature (to-hex-string (sign mac string secret "UTF-8")))))
+(defn valid-hex-signature? [algorithm signature string secret encoding]
+  (let [mac (Mac/getInstance algorithm)
+        calculated-signature (sign mac string secret encoding)]
+    (= signature (to-hex-string calculated-signature))))
