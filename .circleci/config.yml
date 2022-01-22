@@ -1,0 +1,22 @@
+version: 2.1
+
+executors:
+  clojure-tools-deps:
+    docker:
+    - image: circleci/clojure:openjdk-11-tools-deps-1.10.3.998
+jobs:
+  test:
+    executor: clojure-tools-deps
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: clojure -M:test
+
+workflows:
+  main:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.*/
