@@ -1,6 +1,6 @@
 (ns broadcaster.circleci-test
   (:require [broadcaster.circleci :as sut]
-            [clojure.test :refer [deftest is testing]]))
+            [clojure.test :refer [deftest is]]))
 
 (deftest invalid-signature-request
   (let [request {:headers {"content-type" "application/json"
