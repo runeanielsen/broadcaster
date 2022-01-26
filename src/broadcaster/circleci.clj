@@ -8,4 +8,8 @@
 
 (defn circleci-request [request secret]
   (let [valid-request (valid-circleci-signature? request secret)]
-    valid-request))
+    (if (true? valid-request)
+      true
+      (throw
+       (ex-info "The signature does not match"
+                {:type ::invalid-signature})))))

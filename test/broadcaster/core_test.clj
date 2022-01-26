@@ -1,10 +1,9 @@
 (ns broadcaster.core-test
   (:require [broadcaster.core :as sut]
+            [broadcaster.test-data :as test-data]
             [clojure.test :refer [deftest is]]))
 
 (deftest handler
-  (let [expected {:status 200
-                  :headers {"Content-Type" "text/html"}
-                  :body "Hello world"}
-        result (sut/handler nil)]
-    (is (= expected result))))
+  (let [request test-data/job-completed-request
+        result (sut/handler request)]
+    (is (true? result))))
