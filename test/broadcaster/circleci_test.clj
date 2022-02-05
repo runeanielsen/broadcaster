@@ -1,7 +1,7 @@
 (ns broadcaster.circleci-test
   (:require [broadcaster.circleci :as sut]
             [broadcaster.test-data :as test-data]
-            [broadcaster.extensions :refer [catch-thrown-info]]
+            [broadcaster.shared.test-util :refer [catch-thrown-info]]
             [clojure.test :as t :refer [deftest is]]))
 
 (deftest invalid-signature-request
@@ -14,4 +14,4 @@
 (deftest circleci-request
   (let [request test-data/job-completed-request
         result (sut/circleci-request request test-data/secret)]
-    (is (true? result))))
+    (is (= request result))))

@@ -6,4 +6,4 @@
 (deftest handler
   (let [request test-data/job-completed-request
         result (sut/handler request)]
-    (is (true? result))))
+    (is (= request result))))
