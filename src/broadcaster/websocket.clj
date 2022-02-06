@@ -2,13 +2,13 @@
   (:require [clojure.tools.logging :as log]
             [org.httpkit.server :as http-kit]))
 
-(def clients (atom #{}))
+(def ^:private clients (atom #{}))
 
-(defn connect! [channel]
+(defn- connect! [channel]
   (log/info "Channel opened")
   (swap! clients conj channel))
 
-(defn disconnect! [channel status]
+(defn- disconnect! [channel status]
   (log/info "Channel closed: " status)
   (swap! clients disj channel))
 
