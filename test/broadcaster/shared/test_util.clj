@@ -1,4 +1,4 @@
-(ns broadcaster.extensions)
+(ns broadcaster.shared.test-util)
 
 (defmacro catch-thrown-info [f]
   `(try

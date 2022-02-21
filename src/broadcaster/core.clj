@@ -1,25 +1,29 @@
 (ns broadcaster.core
-  (:require [ring.adapter.jetty :refer [run-jetty]]
+  (:require [org.httpkit.server :as http-kit]
+            [compojure.route :refer [not-found]]
+            [compojure.core :refer [defroutes GET]]
             [ring.middleware.reload :refer [wrap-reload]]
-            [broadcaster.circleci :as circleci]))
+            [broadcaster.circleci :as circleci]
+            [broadcaster.websocket :as ws])
+  (:gen-class))
 
-(def secret "my-secret123")
+(defonce circleci-secret (or (System/getenv "BROADCASTER_CIRCLECI_SECRET")
+                             "my-secret123"))
 
-(defmulti route-request
-  (fn [x] ((:headers x) "user-agent")))
+(defonce server (atom nil))
 
-(defmethod route-request "CircleCI/Webhook/1.0" [request]
-  (circleci/circleci-request request secret))
+(defroutes all-routes
+  (GET "/ws" [] ws/handler)
+  (GET "/circleci" [request] (circleci/handler request circleci-secret))
+  (not-found "<p>Page not found.</p>"))
 
-(defmethod route-request :default [x]
-  (throw (IllegalArgumentException.
-          (str "I don't know the " ((:headers x) "user-agent") " user-agent."))))
+(defn stop-server []
+  (when-not (nil? @server)
+    (@server :timeout 100)
+    (reset! server nil)))
 
-(defn handler [request]
-  (route-request request))
+(defn start-server [port]
+  (reset! server (http-kit/run-server (wrap-reload #'all-routes) {:port port})))
 
-(comment
-  (def server
-    (run-jetty (wrap-reload #'handler) {:port 3000 :join? false}))
-  (.start server)
-  (.stop server))
+(defn -main [& _]
+  (start-server 3000))

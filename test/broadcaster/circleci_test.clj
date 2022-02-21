@@ -1,17 +1,16 @@
 (ns broadcaster.circleci-test
   (:require [broadcaster.circleci :as sut]
-            [broadcaster.test-data :as test-data]
-            [broadcaster.extensions :refer [catch-thrown-info]]
+            [broadcaster.test-data.circleci :as test-data]
             [clojure.test :as t :refer [deftest is]]))
 
-(deftest invalid-signature-request
+(deftest handler-invalid-signature
   (let [request test-data/invalid-signature-request
-        expected {:msg "The signature does not match"
-                  :data {:type :broadcaster.circleci/invalid-signature}}]
-    (is (= (catch-thrown-info (sut/circleci-request request test-data/secret))
-           expected))))
+        expected {:status 500
+                  :body "The signature does not match."}
+        result (sut/handler request test-data/secret)]
+    (is (= expected result))))
 
-(deftest circleci-request
+(deftest handler
   (let [request test-data/job-completed-request
-        result (sut/circleci-request request test-data/secret)]
-    (is (true? result))))
+        result (sut/handler request test-data/secret)]
+    (is (= {:status 200} result))))
