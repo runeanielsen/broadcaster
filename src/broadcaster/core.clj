@@ -1,23 +1,29 @@
 (ns broadcaster.core
   (:require [org.httpkit.server :as http-kit]
+            [compojure.route :refer [not-found]]
+            [compojure.core :refer [defroutes GET]]
             [ring.middleware.reload :refer [wrap-reload]]
             [broadcaster.circleci :as circleci]
-            [broadcaster.websocket :as ws]))
+            [broadcaster.websocket :as ws])
+  (:gen-class))
 
-(def circle-ci-secret "my-secret123")
-(def ok {:status 200})
-(def not-found {:status 404})
+(defonce circleci-secret (or (System/getenv "BROADCASTER_CIRCLECI_SECRET")
+                             "my-secret123"))
 
-(defn handler [request]
-  (case (:uri request)
-    "/ws"  (ws/handler request)
-    "/circleci" (let [message (circleci/circleci-request request circle-ci-secret)]
-                  (ws/send-message! message)
-                  ok)
-    not-found))
+(defonce server (atom nil))
 
-(comment
-  (def server
-    (http-kit/run-server (wrap-reload #'handler) {:port 3000 :join? false}))
-  (.start server)
-  (.stop server))
+(defroutes all-routes
+  (GET "/ws" [] ws/handler)
+  (GET "/circleci" [request] (circleci/handler request circleci-secret))
+  (not-found "<p>Page not found.</p>"))
+
+(defn stop-server []
+  (when-not (nil? @server)
+    (@server :timeout 100)
+    (reset! server nil)))
+
+(defn start-server [port]
+  (reset! server (http-kit/run-server (wrap-reload #'all-routes) {:port port})))
+
+(defn -main [& _]
+  (start-server 3000))

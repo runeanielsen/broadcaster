@@ -5,7 +5,7 @@
 (def ^:private clients (atom #{}))
 
 (defn- connect! [channel]
-  (log/info "Channel opened")
+  (log/info "Channel opened.")
   (swap! clients conj channel))
 
 (defn- disconnect! [channel status]
@@ -13,10 +13,13 @@
   (swap! clients disj channel))
 
 (defn send-message! [message]
+  (log/info "Sending messages to connected sockets.")
   (doseq [ch @clients]
-    (http-kit/send! ch message)))
+    (if-let [success-send? (http-kit/send! ch message)]
+      success-send?
+      (log/warn "Could not send message to socket."))))
 
-(defn handler [ring-req]
-  (http-kit/as-channel ring-req
+(defn handler [request]
+  (http-kit/as-channel request
                        {:on-open (fn [ch] (connect! ch))
                         :on-close (fn [ch status] (disconnect! ch status))}))

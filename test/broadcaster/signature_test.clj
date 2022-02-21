@@ -2,21 +2,17 @@
   (:require [broadcaster.signature :as sut]
             [clojure.test :refer [deftest testing is]]))
 
-(deftest valid-hex-signature?
+(deftest valid-hmac-sha256?
   (testing "valid hex signature hmacsha256"
-    (let [string "hello world"
+    (let [text "hello world"
           secret "secret"
           signature "734cc62f32841568f45715aeb9f4d7891324e6d948e4c6c60c0621cdac48623a"
-          algorithm "HMACSHA256"
-          encoding "UTF-8"
-          valid? (sut/valid-hex-signature? algorithm signature string secret encoding)]
+          valid? (sut/valid-hmac-sha256? signature text secret)]
       (is (true? valid?))))
 
-  (testing "valid hex signature hmacsha256"
-    (let [string "hello world"
+  (testing "invalid hex signature hmacsha256"
+    (let [text "hello world"
           secret "secret"
           signature "invalid-signature"
-          algorithm "HMACSHA256"
-          encoding "UTF-8"
-          valid? (sut/valid-hex-signature? algorithm signature string secret encoding)]
+          valid? (sut/valid-hmac-sha256? signature text secret)]
       (is (false? valid?)))))

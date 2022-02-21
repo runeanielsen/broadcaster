@@ -5,7 +5,9 @@
         ring/ring-jetty-adapter {:mvn/version "2.0.0-alpha1"}
         ring/ring-json {:mvn/version "0.5.1"}
         org.clojure/tools.logging {:mvn/version "1.2.4"}
-        http-kit/http-kit {:mvn/version "2.6.0-alpha1"}}
+        http-kit/http-kit {:mvn/version "2.6.0-alpha1"}
+        compojure/compojure {:mvn/version "1.6.2"}
+        org.clojure/core.async {:mvn/version "1.5.648"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.887"}}
                   :main-opts ["-m" "kaocha.runner"]}}}

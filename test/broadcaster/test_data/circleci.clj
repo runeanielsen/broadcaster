@@ -1,4 +1,4 @@
-(ns broadcaster.test-data)
+(ns broadcaster.test-data.circleci)
 
 (def ^:private test-data-path "test/broadcaster/test_data/")
 (def ^:private workflow-completed-body-json (slurp (str test-data-path "workflow-completed.json")))

@@ -1,14 +1,16 @@
 (ns broadcaster.circleci
-  (:require [broadcaster.signature :as signature]))
+  (:require [broadcaster.signature :as signature]
+            [broadcaster.websocket :as ws]))
 
-(defn- valid-circleci-signature? [request secret]
+(defn- valid-signature? [request secret]
   (let [{:keys [headers body]} request
         signature (get headers "circleci-signature")]
-    (signature/valid-hex-signature? "HMACSHA256" signature body secret "UTF-8")))
+    (signature/valid-hmac-sha256? signature body secret)))
 
-(defn circleci-request [request secret]
-  (let [valid-request (valid-circleci-signature? request secret)]
+(defn handler [request secret]
+  (let [valid-request (valid-signature? request secret)]
     (if (true? valid-request)
-      request
-      (throw (ex-info "The signature does not match"
-                      {:type ::invalid-signature})))))
+      (do
+        (ws/send-message! request)
+        {:status 200})
+      {:status 500 :body "The signature does not match."})))
