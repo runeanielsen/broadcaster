@@ -14,10 +14,9 @@
 
 (defn send-message! [message]
   (log/info "Sending messages to connected sockets.")
-  (doseq [ch @clients]
-    (if-let [success-send? (http-kit/send! ch message)]
-      success-send?
-      (log/warn "Could not send message to socket."))))
+  (doseq [client @clients]
+    (cond (not (http-kit/send! client message))
+          (log/warn "Could not send message to socket."))))
 
 (defn handler [request]
   (http-kit/as-channel request
